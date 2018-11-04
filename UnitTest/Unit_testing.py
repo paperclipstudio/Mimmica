@@ -15,7 +15,7 @@ class TestUserCreation(test.TestCase):
         with self.assertRaises(AttributeError):
             print(self.Tom.__password)
 
-        self.assertEqual(self.Tom._bio, 'No bio yet :(')
+        self.assertEqual(self.Tom._bio, '')
         self.Tom.set_bio('Hi my name is Tom, and i love music')
         self.assertEqual(self.Tom.get_bio(), ('Hi my name is Tom, and i love music'))
         self.assertFalse(self.Tom.set_password('bad_pasword', ' H@K£R N£T'))
@@ -66,7 +66,7 @@ class TestUserDatabase(test.TestCase):
         self.assertEqual(self.how_many_users(self.c), 3)
 
     def test_large_sets(self):
-        self.assertEqual(self.how_many_users(self.c),2)
+        self.assertEqual(2, self.how_many_users(self.c))
         large_number = 300
         for i in range(large_number):
             new_user = User.User('test', 'test')
@@ -99,10 +99,11 @@ class TestUserDatabase(test.TestCase):
         DataBase.add_audio(self.audio4, self.c)
 
         newest_by_george = DataBase.get_newest_by(self.george, self.c)
-        print('##' + str(newest_by_george))
         self.assertEqual('2016-03-12', newest_by_george.date)
 
-
+    def test_new_following(self):
+        DataBase.add_follower(self.c, self.george, self.rupert)
+        self.assertTrue(DataBase.is_following(self.c, self.george, self.rupert))
 
 
 

@@ -22,7 +22,7 @@ def create_database(database_name=db):
                                 bio text
                                 )""")
         connection.commit()
-        print('User table created.')
+        #print('User table created.')
     except:
         print('Creating user table failed.')
 
@@ -30,15 +30,27 @@ def create_database(database_name=db):
         connection = sqlite3.connect(database_name)
         connection.execute("""CREATE TABLE audio (
                                 ID  INTEGER PRIMARY KEY,
-                                user_name text,
-                                file_name text,
+                                filename text,
+                                username text,
                                 created date 
                                 )""")
         connection.commit()
-        print('Audio table created.')
+        #print('Audio table created.')
     except:
         print('Creating Audio table failed.')
 
+    try:
+        connection = sqlite3.connect(database_name)
+        connection.execute("""CREATE TABLE following (
+                                ID  INTEGER PRIMARY KEY,
+                                username text,
+                                following text,
+                                since date 
+                                )""")
+        connection.commit()
+        #print('Friend table created.')
+    except:
+        print('Creating Audio table failed.')
     return connection
 
 
@@ -71,33 +83,61 @@ def remove_user(user_name:str, connection):
 
 def add_audio(new_audio,connection):
     cursor = connection.cursor()
-    cursor.execute("INSERT INTO audio VALUES (NULL, :file_name, :name, :created)", {
+    cursor.execute("INSERT INTO audio VALUES (NULL, :file_name, :user_name, :created)", {
         'file_name': new_audio.file,
-        'name': new_audio.creator,
+        'user_name': new_audio.creator,
         'created': new_audio.date
     })
     connection.commit()
 
+def print_table(connection:sqlite3.connect, table_name:str):
+    cursor = connection.cursor()
+    # TODO Make it so that table_name is parsed into execute
+    cursor.execute("SELECT * FROM following ")#, (table_name,))
+    table = cursor.fetchall()
+    names = ''
+    for column_name in  cursor.description:
+        names += column_name[0] + '   '
+    print (names)
+    for row in table:
+        print('|' + '-' * len(str(row)))
+        print('| ' + str(row) )
 
 def convert_to_audio_class(list):
-    if list == None : return None
+    if not list:
+
+        print("Convert to audio class was given none.")
+        raise TypeError
+        return None
     return Audio(list[1],list[2],list[3])
 
 def get_newest_audio(connection):
     cursor = connection.cursor()
     cursor.execute("SELECT * FROM audio ORDER by created")
-    connection.commit()
     return convert_to_audio_class(cursor.fetchone())
 
 def get_newest_by(users:User,connection):
     cursor = connection.cursor()
-    cursor.execute("SELECT * FROM audio WHERE user_name = ? ORDER by created", (users.name,))
-    print('~~' + users.name)
-    print_
+    cursor.execute("SELECT * FROM audio WHERE username = ?", (users.name,))
     connection.commit()
     return convert_to_audio_class(cursor.fetchone())
 
 
+def add_follower(connection:sqlite3.connect, user:User, following):
+    cursor = connection.cursor()
+    print_table(connection, 'following')
+    cursor.execute("INSERT INTO following VALUES (NULL, :user, :following, DATETIME() )", {
+        'user' : user.name,
+        'following' : following.name
+    })
 
+    connection.commit()
 
+def is_following(connection:sqlite3.connect, user:User, following:User) -> bool:
+    cursor = connection.cursor()
+    cursor.execute('''SELECT ID FROM following WHERE username = ? AND following = ?''', (user.name, following.name))
+    if cursor:
+        return True
+    else:
+        return False
 

@@ -1,18 +1,15 @@
 class User():
+    ##TODO make paswords safer
     def __init__(self, name = None, password = None):
-        if (not name):
-            print("please enter name")
-            return
-        if not password:
-            print("please enter password")
-            return
+        if not (type(name) == str): raise NameError("Invalid name for new user")
+        if not (type(password) == str): raise NameError("Invalid password for new user")
         self.name = name
         self.__password = password
         self._audio = []
         self._friends = []
-        self._bio = 'No bio yet :('
+        self._bio = ''
 
-    def __str__(self):
+    def __repr__(self):
         return self.name
 
     def set_bio(self, bio_line:str):

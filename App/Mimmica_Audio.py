@@ -17,5 +17,8 @@ class Audio():
         self.creator = creator
         self.date = date
 
+    def __str__(self):
+        return self.file + " by " + self.creator + ' on ' + self.date +'.'
+
     def play(self):
         winsound.PlaySound('../Audio/' +  self.file, winsound.SND_FILENAME)
