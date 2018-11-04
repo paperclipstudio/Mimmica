@@ -1,8 +1,11 @@
 class User():
     ##TODO make paswords safer
     def __init__(self, name = None, password = None):
-        if not (type(name) == str): raise NameError("Invalid name for new user")
-        if not (type(password) == str): raise NameError("Invalid password for new user")
+        if not (type(name) == str) or (len(name) > 15):
+            raise NameError("Invalid name for new user")
+        if not (type(password) == str or len(password > 25)):
+            raise NameError("Invalid password for new user")#
+
         self.name = name
         self.__password = password
         self._audio = []
@@ -13,7 +16,10 @@ class User():
         return self.name
 
     def set_bio(self, bio_line:str):
-        self._bio = bio_line
+        if (type(bio_line) == str) and (len(bio_line) < 256):
+            self._bio = bio_line
+        else:
+            raise TypeError
 
     def get_bio(self):
         return self._bio
@@ -31,8 +37,6 @@ class User():
         else:
             print (self.name + ' Wrong password :(')
             return False
-
-
 
     def get_password(self):
         return self.__password

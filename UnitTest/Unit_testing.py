@@ -104,6 +104,21 @@ class TestUserDatabase(test.TestCase):
     def test_new_following(self):
         DataBase.add_follower(self.c, self.george, self.rupert)
         self.assertTrue(DataBase.is_following(self.c, self.george, self.rupert))
+        self.assertFalse(DataBase.is_following(self.c, self.rupert, self.george))
+
+        DataBase.remove_follow(self.c, self.george, self.rupert)
+        self.assertFalse(DataBase.is_following(self.c, self.george, self.rupert))
+
+
+class test_audio_class(test.TestCase):
+    def test_errors(self):
+        audioA = Audio.Audio('somefile.wav', 'Someuser', '2017-02-23')
+        with self.assertRaises(TypeError):
+            bad_audio = Audio.Audio('otherfile.wav', '', '1970-01-01')
+            bad_audio = Audio.Audio('otherfile.wav', 'someone', '')
+            bad_audio = Audio.Audio('', 'someone', '1970-01-01')
+
+
 
 
 

@@ -22,7 +22,6 @@ def create_database(database_name=db):
                                 bio text
                                 )""")
         connection.commit()
-        #print('User table created.')
     except:
         print('Creating user table failed.')
 
@@ -35,7 +34,6 @@ def create_database(database_name=db):
                                 created date 
                                 )""")
         connection.commit()
-        #print('Audio table created.')
     except:
         print('Creating Audio table failed.')
 
@@ -48,7 +46,6 @@ def create_database(database_name=db):
                                 since date 
                                 )""")
         connection.commit()
-        #print('Friend table created.')
     except:
         print('Creating Audio table failed.')
     return connection
@@ -61,6 +58,10 @@ def connect_to_db(database_name = db):
     except:
         print('failed to connect to database.')
 
+class NoUserError(Exception):
+    # TODO Add not a user exception when a user can't be found
+    pass
+
 def add_user(new_user:User, cursor):
     #TODO make unique username
     cursor.execute("INSERT INTO users VALUES (NULL, :name, :passwrd, :bio)", {
@@ -69,6 +70,7 @@ def add_user(new_user:User, cursor):
                                                                          'bio':new_user.get_bio()
                                                                          })
     cursor.commit()
+
 
 def remove_user(user_name:str, connection):
     cursor = connection.cursor()
@@ -90,6 +92,7 @@ def add_audio(new_audio,connection):
     })
     connection.commit()
 
+
 def print_table(connection:sqlite3.connect, table_name:str):
     cursor = connection.cursor()
     # TODO Make it so that table_name is parsed into execute
@@ -102,6 +105,7 @@ def print_table(connection:sqlite3.connect, table_name:str):
     for row in table:
         print('|' + '-' * len(str(row)))
         print('| ' + str(row) )
+
 
 def convert_to_audio_class(list):
     if not list:
@@ -125,7 +129,6 @@ def get_newest_by(users:User,connection):
 
 def add_follower(connection:sqlite3.connect, user:User, following):
     cursor = connection.cursor()
-    print_table(connection, 'following')
     cursor.execute("INSERT INTO following VALUES (NULL, :user, :following, DATETIME() )", {
         'user' : user.name,
         'following' : following.name
@@ -133,10 +136,16 @@ def add_follower(connection:sqlite3.connect, user:User, following):
 
     connection.commit()
 
+def remove_follow(connection:sqlite3.connect, user:User, following:User):
+    cursor = connection.cursor()
+    cursor.execute("DELETE FROM following WHERE username = ? AND following = ?", (user.name, following.name))
+    connection.commit()
+
 def is_following(connection:sqlite3.connect, user:User, following:User) -> bool:
     cursor = connection.cursor()
     cursor.execute('''SELECT ID FROM following WHERE username = ? AND following = ?''', (user.name, following.name))
-    if cursor:
+
+    if cursor.fetchone():
         return True
     else:
         return False

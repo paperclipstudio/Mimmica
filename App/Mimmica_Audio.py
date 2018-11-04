@@ -2,14 +2,15 @@ import winsound
 
 class Audio():
     def __init__(self, file=None, creator=None, date=None):
-        if file==None:
+        if not file:
             print('No attached file.')
+            raise TypeError
 
-        if creator==None:
+        if not creator:
             print('No creator')
             raise TypeError
 
-        if date==None:
+        if not date:
             print('No attached date.')
             raise TypeError
 
@@ -17,7 +18,7 @@ class Audio():
         self.creator = creator
         self.date = date
 
-    def __str__(self):
+    def __repr__(self):
         return self.file + " by " + self.creator + ' on ' + self.date +'.'
 
     def play(self):
