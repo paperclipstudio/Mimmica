@@ -22,4 +22,4 @@ class Audio():
         return self.file + " by " + self.creator + ' on ' + self.date +'.'
 
     def play(self):
-        winsound.PlaySound('../Audio/' +  self.file, winsound.SND_FILENAME)
+        winsound.PlaySound('../Audio/' + self.file, winsound.SND_FILENAME)

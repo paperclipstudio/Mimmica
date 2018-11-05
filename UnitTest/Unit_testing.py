@@ -5,6 +5,7 @@ import os
 import App.Mimmica_User as User
 import App.Database as DataBase
 import App.Mimmica_Audio as Audio
+import App.Mimmica_Recording as Recording
 
 class TestUserCreation(test.TestCase):
     def setUp(self):
@@ -118,9 +119,31 @@ class test_audio_class(test.TestCase):
             bad_audio = Audio.Audio('otherfile.wav', 'someone', '')
             bad_audio = Audio.Audio('', 'someone', '1970-01-01')
 
+class test_audio_recording(test.TestCase):
+    def setUp(self):
+        try:
+            os.remove('../Audio/test/001.wav')
+        except:
+            pass
+        os.open('../Audio/test/001.wav',os.O_RDWR|os.O_CREAT )
 
+    def test_creation(self):
+        Recording.record('../Audio/test/')
+        self.assertTrue(os.path.exists('../Audio/test/001.wav'))
+        my_audio = Audio.Audio('test/001.wav', 'George', '1970-01-01')
+        my_audio.play()
+        print('audio should have played back')
 
+    def test_record_from_user_class(self):
+        userA = User.User('Tom', 'testing')
+        userA.record('test/')
+        self.assertTrue(os.path.exists('../Audio/test/002.wav'))
 
+    def tearDown(self):
+        try:
+            pass
+        except:
+            print('test path never created')
 
 if __name__ == '__main__':
     test.main()
