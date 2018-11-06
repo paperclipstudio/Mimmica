@@ -48,7 +48,8 @@ class TestUserDatabase(test.TestCase):
         self.audio3 = Audio.Audio('sos.wav', 'Michel', '2014-06-16')
         self.audio4 = Audio.Audio('truck.wav', 'Rupert', '2011-02-21')
 
-        DataBase.add_audio(self.audio1, self.c)
+        audio_data = Recording.record()
+        DataBase.add_audio_from_data(audio_data, self.tom, self.c)
 
 
         DataBase.add_user(self.rupert, self.c)
@@ -89,18 +90,29 @@ class TestUserDatabase(test.TestCase):
     def tearDown(self):
         self.c.close()
 
-    def test_add_audio(self):
-        newest = DataBase.get_newest_audio(self.c)
-        self.assertEqual('2017-02-10', newest.date)
+    # def test_add_audio(self):
+    #     newest = DataBase.get_newest_audio(self.c)
+    #     self.assertEqual('2017-02-10', newest.date)
 
-    def test_audio_table_functions(self):
-        DataBase.add_audio(self.audio1, self.c)
-        DataBase.add_audio(self.audio2, self.c)
-        DataBase.add_audio(self.audio3, self.c)
-        DataBase.add_audio(self.audio4, self.c)
+    def test_reserve_audio_ID(self):
+        DataBase.print_table(self.c, 'audio')
+        self.assertEqual(2, DataBase.reserve_audio_ID(self.c, self.rupert))
+        DataBase.print_table(self.c, 'audio')
+        self.assertEqual(3, DataBase.reserve_audio_ID(self.c, self.george))
 
-        newest_by_george = DataBase.get_newest_by(self.george, self.c)
-        self.assertEqual('2016-03-12', newest_by_george.date)
+        self.assertEqual(4, DataBase.reserve_audio_ID(self.c, self.rupert))
+
+    #
+    # def test_audio_table_functions(self):
+    #     DataBase.reserve_audio_ID(self.c, self.rupert)
+    #     DataBase.reserve_audio_ID(self.c, self.rupert)
+    #     DataBase.reserve_audio_ID(self.c, self.rupert)
+    #     DataBase.reserve_audio_ID(self.c, self.rupert)
+    #
+    #     newest_by_george = DataBase.get_newest_by(self.george, self.c)
+    #     self.assertEqual('2016-03-12', newest_by_george.date)
+    #
+
 
     def test_new_following(self):
         DataBase.add_follower(self.c, self.george, self.rupert)
@@ -110,14 +122,24 @@ class TestUserDatabase(test.TestCase):
         DataBase.remove_follow(self.c, self.george, self.rupert)
         self.assertFalse(DataBase.is_following(self.c, self.george, self.rupert))
 
+    def test_record_from_user_class(self):
+        userA = User.User('Tom', 'testing')
+        audio_data = userA.record()
+        self.assertTrue(os.path.exists('../Audio/test/001.wav'))
+        DataBase.add_audio_from_data(audio_data, userA, self.c)
+        self.assertTrue(os.path.exists('../Audio/test/002.wav'))
+
+
 
 class test_audio_class(test.TestCase):
     def test_errors(self):
         audioA = Audio.Audio('somefile.wav', 'Someuser', '2017-02-23')
         with self.assertRaises(TypeError):
             bad_audio = Audio.Audio('otherfile.wav', '', '1970-01-01')
-            bad_audio = Audio.Audio('otherfile.wav', 'someone', '')
+            bad_audio = Audio.Audio('otherfile.wav', 'someone', '1930-12-25')
             bad_audio = Audio.Audio('', 'someone', '1970-01-01')
+
+
 
 class test_audio_recording(test.TestCase):
     def setUp(self):
@@ -128,16 +150,20 @@ class test_audio_recording(test.TestCase):
         os.open('../Audio/test/001.wav',os.O_RDWR|os.O_CREAT )
 
     def test_creation(self):
-        Recording.record('../Audio/test/')
+        audio_test = Recording.record()
+        Recording.SaveAudiotoWav('Audio/test/', '001.wav', audio_test)
+
         self.assertTrue(os.path.exists('../Audio/test/001.wav'))
         my_audio = Audio.Audio('test/001.wav', 'George', '1970-01-01')
         my_audio.play()
         print('audio should have played back')
 
-    def test_record_from_user_class(self):
-        userA = User.User('Tom', 'testing')
-        userA.record('test/')
-        self.assertTrue(os.path.exists('../Audio/test/002.wav'))
+
+
+    def test_data_recording_functions(self):
+        #todo this
+        pass
+
 
     def tearDown(self):
         try:

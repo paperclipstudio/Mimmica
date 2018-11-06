@@ -1,3 +1,4 @@
+
 class User():
     ##TODO make paswords safer
     def __init__(self, name = None, password = None):
@@ -11,6 +12,7 @@ class User():
         self._audio = []
         self._friends = []
         self._bio = ''
+        self.database_name = 'TestingDatabase'
 
     def __repr__(self):
         return self.name
@@ -47,5 +49,7 @@ class User():
         else:
             print("username isn't a string")
 
-
+    def record(self, path='../Audio/'):
+        #todo User.Record
+        pass
 

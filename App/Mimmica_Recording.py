@@ -1,15 +1,18 @@
 import os
 import wave
 import pyaudio
+import App.Database
 
-def record(pathname:str):
-    CHUNK = 1024
-    FORMAT = pyaudio.paInt16
-    CHANNELS = 2
-    RATE = 44100
-    RECORD_SECONDS = 5
-    WAVE_OUTPUT_FILENAME = pathname + '001.wav'
+CHUNK = 1024
+FORMAT = pyaudio.paInt16
+CHANNELS = 2
+RATE = 44100
+RECORD_SECONDS = 0
 
+def record() -> [pyaudio.paInt16]:
+
+
+    #TODO change recording times back
     p = pyaudio.PyAudio()
 
     stream = p.open(format=FORMAT,
@@ -31,11 +34,14 @@ def record(pathname:str):
     stream.stop_stream()
     stream.close()
     p.terminate()
+    return frames
 
-
+def SaveAudiotoWav(pathname:str, fileID:str, audio:[pyaudio.paInt16]):
+    WAVE_OUTPUT_FILENAME = '../' + pathname + fileID
     wf = wave.open(WAVE_OUTPUT_FILENAME, 'wb')
     wf.setnchannels(CHANNELS)
-    wf.setsampwidth(p.get_sample_size(FORMAT))
+    wf.setsampwidth(pyaudio.PyAudio().get_sample_size(FORMAT))
     wf.setframerate(RATE)
-    wf.writeframes(b''.join(frames))
+    wf.writeframes(b''.join(audio))
     wf.close()
+
